@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -17,7 +18,6 @@ import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.SmallNote;
 
 import java.util.List;
-
 public class MainActivity extends AppCompatActivity  implements NoteRecyclerViewAdapter.NoteAdapterCallback {
 
     private NoteViewModel noteViewModel;
@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity  implements NoteRecyclerView
         recyclerView.setAdapter(noteRecyclerViewAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
         noteViewModel.getSmallNotes().observe(this, new Observer<List<SmallNote>>() {
             @Override
