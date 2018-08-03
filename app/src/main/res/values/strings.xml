@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">끄적끄적</string>
+    <string name="btn_save">저장</string>
+    <string name="date_created">생성일:</string>
+    <string name="date_modified">수정일:</string>
+    <string name="title">제목</string>
+    <string name="contents">내용</string>
+</resources>
