@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -25,6 +26,7 @@ public class EditActivity extends AppCompatActivity {
 
     private TextView title;
     private TextView contents;
+    private ImageView picture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class EditActivity extends AppCompatActivity {
 
         title = findViewById(R.id.title);
         contents = findViewById(R.id.contents);
+        picture = findViewById(R.id.picture);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -53,6 +56,9 @@ public class EditActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+                //id가 있을 경우 만약 사진이 있다면 보여준다.
+                //사진을 눌렀을 때 다른 사진을 설정할 수 있도록 한다.
             }
         } else {
             isUpdateMode = false;

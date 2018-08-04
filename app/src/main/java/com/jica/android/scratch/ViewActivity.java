@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
@@ -33,9 +34,13 @@ public class ViewActivity extends AppCompatActivity {
         // ui
         final TextView title = findViewById(R.id.title);
         final TextView contents = findViewById(R.id.contents);
-        contents.setMovementMethod(ScrollingMovementMethod.getInstance());
         final TextView created = findViewById(R.id.created);
         final TextView modified = findViewById(R.id.modified);
+        final ImageView picture = findViewById(R.id.picture);
+
+
+        //사진을 가져와서 보여준다.
+        //사진을 눌렀을 때 사진을 크게 보여준다.
 
         //getNote view data
         Intent intent = getIntent();
@@ -64,7 +69,7 @@ public class ViewActivity extends AppCompatActivity {
                 });
             }
         }else {
-            Log.d("View", "must need id ");
+            Log.d("ViewActivity", "id must provided");
             finish();
         }
 
