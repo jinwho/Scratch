@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 
 import com.jica.android.scratch.adapter.NoteRecyclerViewAdapter;
@@ -18,13 +20,19 @@ import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.SmallNote;
 
 import java.util.List;
-public class MainActivity extends AppCompatActivity  implements NoteRecyclerViewAdapter.NoteAdapterCallback {
+
+public class MainActivity extends AppCompatActivity implements NoteRecyclerViewAdapter.NoteAdapterCallback {
 
     private NoteViewModel noteViewModel;
+
+    static {
+       AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
 
@@ -52,6 +60,8 @@ public class MainActivity extends AppCompatActivity  implements NoteRecyclerView
                 startActivity(intent);
             }
         });
+
+
     }
 
     @Override
@@ -62,7 +72,7 @@ public class MainActivity extends AppCompatActivity  implements NoteRecyclerView
     @Override
     public void viewCallback(int id) {
         Intent intent = new Intent(this, ViewActivity.class);
-        intent.putExtra("id",id);
+        intent.putExtra("id", id);
         startActivity(intent);
     }
 }
