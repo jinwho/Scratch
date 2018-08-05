@@ -41,3 +41,10 @@ dependencies {
     androidTestImplementation "android.arch.persistence.room:testing:$room_version"
 
 }
+
+//butter knife
+dependencies {
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+
+}

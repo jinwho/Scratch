@@ -13,12 +13,13 @@ public class Note {
     @PrimaryKey(autoGenerate = true)
     private Integer id;
 
-    private Date created;
-    private Date modified;
+    private String filename;
 
     private String title;
     private String contents;
+    private Date created;
 
+    private Date modified;
     public Integer getId() {
         return id;
     }
@@ -57,5 +58,13 @@ public class Note {
 
     public void setContents(String contents) {
         this.contents = contents;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }
