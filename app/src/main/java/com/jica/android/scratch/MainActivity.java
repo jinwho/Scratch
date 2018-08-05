@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
 
         TODO 3
         onDestroy 에서 sharedpreference의 값을 삭제 한다.
+
         */
 
         // set recyclerView and Adapter

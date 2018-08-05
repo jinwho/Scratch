@@ -37,7 +37,7 @@ public class ViewActivity extends AppCompatActivity {
     // Note data
     private NoteViewModel noteViewModel;
     private Note note;
-    private boolean isNewNote = false;
+    private boolean isNewNote;
 
     // ui data
     @BindView(R.id.title)
@@ -52,16 +52,15 @@ public class ViewActivity extends AppCompatActivity {
     ImageView picture;
 
     //edit state
-    private boolean isTitleChanged;
-    private boolean isContentsChanged;
-    private boolean isPhotoChanged;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
         ButterKnife.bind(this);
+        noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
 
+        //set up toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -72,34 +71,33 @@ public class ViewActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
         }
 
-        noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
-
         //getNote view data
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
             if (extras.containsKey("id")) {
+                isNewNote = false;
                 Integer id = extras.getInt("id");
+
                 noteViewModel.getNote(id).observe(this, new Observer<Note>() {
                     @Override
-                    public void onChanged(@Nullable Note note) {
+                    public void onChanged(@Nullable Note observe_note) {
                         //set ui
-                        if (note != null) {
-                            ViewActivity.this.note = note;
+                        if (observe_note != null) {
+                            note = observe_note;
+                            title.setText(observe_note.getTitle());
+                            contents.setText(observe_note.getContents());
 
-                            title.setText(note.getTitle());
-                            contents.setText(note.getContents());
-
-                            //set print format
+                            //set date print format
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd / HH:mm:ss", Locale.getDefault());
-                            String createdText = format.format(note.getCreated());
-                            String modifiedText = format.format(note.getModified());
+                            String createdText = format.format(observe_note.getCreated());
+                            String modifiedText = format.format(observe_note.getModified());
 
                             created.setText(createdText);
                             modified.setText(modifiedText);
 
                             //만약 사진이 있다면 보여준다.
-                            String filename = note.getFilename();
+                            String filename = observe_note.getFilename();
                             if (filename != null) {
                                 picture.setVisibility(View.VISIBLE);
                                 File file = new File(getFilesDir(), filename);
@@ -116,19 +114,6 @@ public class ViewActivity extends AppCompatActivity {
             note = new Note();
             isNewNote = true;
         }
-
-        //사진 클릭시 사진을 크게 보여준다.
-        picture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, SELECT_FROM_GALLERY);
-
-                //TODO result를 처리하는 코드 짤 것
-
-            }
-        });
     }
 
     @Override
@@ -142,16 +127,29 @@ public class ViewActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // TODO
         switch (item.getItemId()) {
+            case R.id.menu_save:
+                saveNote();
+                finish();
             case R.id.menu_gallery:
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, SELECT_FROM_GALLERY);
                 return true;
             case R.id.menu_delete:
+                noteViewModel.delete(note.getId());
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SELECT_FROM_GALLERY && resultCode == RESULT_OK) {
+            //TODO 사진을 가져와 보여준다, 노트에 파일이름을 추가 한다, 사진은 전역변수로 기억했다가 필요에 따라 저장한다.
+        }
+    }
 
     // TODO
     // title, contents의 내용이 변경되거나
