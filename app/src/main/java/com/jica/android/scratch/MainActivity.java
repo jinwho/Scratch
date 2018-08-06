@@ -6,34 +6,36 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.ImageView;
 
 
 import com.jica.android.scratch.adapter.NoteRecyclerViewAdapter;
 import com.jica.android.scratch.db.NoteViewModel;
-import com.jica.android.scratch.db.entity.Note;
 import com.jica.android.scratch.db.entity.SmallNote;
 
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements NoteRecyclerViewAdapter.NoteAdapterCallback {
 
     private NoteViewModel noteViewModel;
 
+    @BindView(R.id.night_mode)
+    ImageView night_mode;
+    @BindView(R.id.recyclerview)
+    RecyclerView recyclerview;
 
     // TODO
     static {
-       AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
     }
 
     @Override
@@ -42,31 +44,16 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
 
         setContentView(R.layout.activity_main);
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
+        ButterKnife.bind(this);
 
-        /*
-
-        TODO
-        sharedpreference 를 읽어서 nightmod 값을 읽어온다.
-        if null MODE_NIGHT_AUTO
-        if true set MODE_NIGHT_YES
-        if false set MODE_NIGHT_NO
-
-        TODO 2
-        툴바에 있는 이미지를 클릭시 sharedpreference의 nightmod값을 바꾸고
-        현재 액티비티를 recreate한다.
-
-        TODO 3
-        onDestroy 에서 sharedpreference의 값을 삭제 한다.
-
-        */
 
         // set recyclerView and Adapter
-        RecyclerView recyclerView = findViewById(R.id.recyclerview);
         final NoteRecyclerViewAdapter noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(this);
-        recyclerView.setAdapter(noteRecyclerViewAdapter);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerview.setAdapter(noteRecyclerViewAdapter);
+        recyclerview.setHasFixedSize(true);
+        recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        recyclerview.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+
 
         noteViewModel.getSmallNotes().observe(this, new Observer<List<SmallNote>>() {
             @Override
@@ -80,14 +67,33 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         fab_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, ViewActivity.class);
+                Intent intent = new Intent(MainActivity.this, EditActivity.class);
                 startActivity(intent);
             }
         });
 
+        night_mode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*
 
+                TODO
+                sharedpreference 를 읽어서 nightmode 값을 읽어온다.
+                if null MODE_NIGHT_AUTO
+                if true set MODE_NIGHT_YES
+                if false set MODE_NIGHT_NO
+
+                TODO 2
+                툴바에 있는 이미지를 클릭시 sharedpreference의 nightmod값을 바꾸고
+                현재 액티비티를 recreate한다.
+
+                TODO 3
+                onDestroy 에서 sharedpreference의 값을 삭제 한다.
+
+                */
+            }
+        });
     }
-
 
 
     @Override
