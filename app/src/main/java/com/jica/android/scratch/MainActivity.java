@@ -3,15 +3,15 @@ package com.jica.android.scratch;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 
@@ -28,15 +28,16 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
 
     private NoteViewModel noteViewModel;
 
-    @BindView(R.id.night_mode)
-    ImageView night_mode;
+    private SharedPreferences sharedPref;
+    private String currentMode;
+
     @BindView(R.id.recyclerview)
     RecyclerView recyclerview;
+    @BindView(R.id.night_mode_btn)
+    ImageView night_mode_btn;
+    @BindView(R.id.add_btn)
+    ImageButton add_btn;
 
-    // TODO
-    static {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +48,53 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         ButterKnife.bind(this);
 
 
+        // set up day or night theme
+        sharedPref = getPreferences(MODE_PRIVATE);
+        currentMode = sharedPref.getString("night_mode_btn", null);
+        if (currentMode != null) {
+            switch (currentMode) {
+                case "auto" :
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+                    night_mode_btn.setImageResource(R.drawable.grey_logo);
+                    break;
+                case "day" :
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    night_mode_btn.setImageResource(R.drawable.black_logo);
+                    break;
+                case "night" :
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    night_mode_btn.setImageResource(R.drawable.white_logo);
+                    break;
+                default:
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+                    night_mode_btn.setImageResource(R.drawable.grey_logo);
+                    break;
+            }
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+            night_mode_btn.setImageResource(R.drawable.grey_logo);
+        }
+
+        /*
+
+        TODO
+        sharedpreference 를 읽어서 nightmode 값을 읽어온다.
+        if null MODE_NIGHT_AUTO
+
+        if white set MODE_NIGHT_YES -> white_logo
+        if black set MODE_NIGHT_NO -> black_logo
+        if grey set MODE_NIGHT_AUTO -> grey_logo
+
+        */
+
+
+
         // set recyclerView and Adapter
         final NoteRecyclerViewAdapter noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(this);
         recyclerview.setAdapter(noteRecyclerViewAdapter);
         recyclerview.setHasFixedSize(true);
         recyclerview.setLayoutManager(new LinearLayoutManager(this));
-        recyclerview.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        //recyclerview.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
 
         noteViewModel.getSmallNotes().observe(this, new Observer<List<SmallNote>>() {
@@ -63,8 +105,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
             }
         });
 
-        FloatingActionButton fab_add = findViewById(R.id.fab_add);
-        fab_add.setOnClickListener(new View.OnClickListener() {
+        add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, EditActivity.class);
@@ -72,25 +113,35 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
             }
         });
 
-        night_mode.setOnClickListener(new View.OnClickListener() {
+        night_mode_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*
-
-                TODO
-                sharedpreference 를 읽어서 nightmode 값을 읽어온다.
-                if null MODE_NIGHT_AUTO
-                if true set MODE_NIGHT_YES
-                if false set MODE_NIGHT_NO
-
-                TODO 2
-                툴바에 있는 이미지를 클릭시 sharedpreference의 nightmod값을 바꾸고
-                현재 액티비티를 recreate한다.
-
-                TODO 3
-                onDestroy 에서 sharedpreference의 값을 삭제 한다.
-
-                */
+                // 툴바 로고 클릭시 night_mode_btn 설정 값을 바꾼다.
+                SharedPreferences.Editor editor;
+                String nextMode;
+                if (currentMode != null) {
+                    switch (currentMode) {
+                        case "auto":
+                            nextMode = "day";
+                            break;
+                        case "day":
+                            nextMode = "night";
+                            break;
+                        case "night":
+                            nextMode = "auto";
+                            break;
+                        default:
+                            nextMode = "auto";
+                            break;
+                    }
+                } else {
+                    nextMode = "auto";
+                }
+                editor = sharedPref.edit();
+                editor.putString("night_mode_btn", nextMode);
+                editor.apply();
+                // 액티비티 recreate.
+                recreate();
             }
         });
     }
