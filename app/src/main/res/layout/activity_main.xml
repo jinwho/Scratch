@@ -32,11 +32,12 @@
         android:id="@+id/add_btn"
         android:layout_width="0dp"
         android:layout_height="?attr/actionBarSize"
+        android:contentDescription="@string/image_view_description"
+        android:tint="@android:color/darker_gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@android:drawable/ic_input_add"
-        android:contentDescription="@string/image_view_description" />
+        app:srcCompat="@android:drawable/ic_input_add" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"

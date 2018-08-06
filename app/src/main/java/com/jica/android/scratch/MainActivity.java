@@ -28,11 +28,14 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
 
     private NoteViewModel noteViewModel;
 
+    //for night mode
     private SharedPreferences sharedPref;
     private String currentMode;
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerview;
+
+    //buttons
     @BindView(R.id.night_mode_btn)
     ImageView night_mode_btn;
     @BindView(R.id.add_btn)
@@ -48,20 +51,21 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         ButterKnife.bind(this);
 
 
-        // set up day or night theme
+        // set theme based preference
         sharedPref = getPreferences(MODE_PRIVATE);
-        currentMode = sharedPref.getString("night_mode_btn", null);
+        currentMode = sharedPref.getString("night_mode", null);
         if (currentMode != null) {
             switch (currentMode) {
-                case "auto" :
+                //나이트 모드 상태에 따라 이미지를 바꾼다.
+                case "auto":
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
                     night_mode_btn.setImageResource(R.drawable.grey_logo);
                     break;
-                case "day" :
+                case "day":
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                     night_mode_btn.setImageResource(R.drawable.black_logo);
                     break;
-                case "night" :
+                case "night":
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                     night_mode_btn.setImageResource(R.drawable.white_logo);
                     break;
@@ -74,19 +78,6 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
             night_mode_btn.setImageResource(R.drawable.grey_logo);
         }
-
-        /*
-
-        TODO
-        sharedpreference 를 읽어서 nightmode 값을 읽어온다.
-        if null MODE_NIGHT_AUTO
-
-        if white set MODE_NIGHT_YES -> white_logo
-        if black set MODE_NIGHT_NO -> black_logo
-        if grey set MODE_NIGHT_AUTO -> grey_logo
-
-        */
-
 
 
         // set recyclerView and Adapter
@@ -116,8 +107,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         night_mode_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // 툴바 로고 클릭시 night_mode_btn 설정 값을 바꾼다.
-                SharedPreferences.Editor editor;
+                // if toolbar clicked change theme
                 String nextMode;
                 if (currentMode != null) {
                     switch (currentMode) {
@@ -137,10 +127,11 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
                 } else {
                     nextMode = "auto";
                 }
+                SharedPreferences.Editor editor;
                 editor = sharedPref.edit();
-                editor.putString("night_mode_btn", nextMode);
+                editor.putString("night_mode", nextMode);
                 editor.apply();
-                // 액티비티 recreate.
+
                 recreate();
             }
         });
@@ -149,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
 
     @Override
     public void deleteCallback(int id) {
+        //지울 때 사진도 지워야 한다.
         noteViewModel.delete(id);
     }
 
