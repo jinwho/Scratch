@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         recyclerview.setAdapter(noteRecyclerViewAdapter);
         recyclerview.setHasFixedSize(true);
         recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        //no need to have separator line
         //recyclerview.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
 
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
             }
         });
 
+        //start add activity
         add_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         night_mode_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // if toolbar clicked change theme
+                // change theme Preference
                 SharedPreferences.Editor editor;
                 editor = sharedPref.edit();
                 editor.putInt("night_mode", nextMode);
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
 
     @Override
     public void deleteCallback(int id) {
-        //지울 때 사진도 지워야 한다.
+        //TODO 지울 때 사진도 지워야 한다.
         noteViewModel.delete(id);
     }
 

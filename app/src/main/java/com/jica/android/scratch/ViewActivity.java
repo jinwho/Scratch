@@ -109,7 +109,7 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                // TODO view picture
             }
         });
     }
