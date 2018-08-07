@@ -30,8 +30,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
 
     //for night mode
     private SharedPreferences sharedPref;
-    private int currentMode;
-    private int nextMode;
+    private int night_mode;
 
     @BindView(R.id.recyclerview)
     RecyclerView recyclerview;
@@ -55,22 +54,23 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         // set theme based preference
         sharedPref = getPreferences(MODE_PRIVATE);
         // key, default value
-        currentMode = sharedPref.getInt("night_mode", AppCompatDelegate.MODE_NIGHT_AUTO);
-        AppCompatDelegate.setDefaultNightMode(currentMode);
+        night_mode = sharedPref.getInt("night_mode", AppCompatDelegate.MODE_NIGHT_AUTO);
+        AppCompatDelegate.setDefaultNightMode(night_mode);
 
-        switch (currentMode) {
-            //나이트 모드 상태에 따라 이미지를 바꾼다.
+        switch (night_mode) {
+            //나이트 모드 상태에 따라 로고 이미지를 바꾼다.
             case AppCompatDelegate.MODE_NIGHT_AUTO:
                 night_mode_btn.setImageResource(R.drawable.grey_logo);
-                nextMode = AppCompatDelegate.MODE_NIGHT_NO;
+                //다음 값을 저장해놓는다.
+                night_mode = AppCompatDelegate.MODE_NIGHT_NO;
                 break;
             case AppCompatDelegate.MODE_NIGHT_NO:
                 night_mode_btn.setImageResource(R.drawable.black_logo);
-                nextMode = AppCompatDelegate.MODE_NIGHT_YES;
+                night_mode = AppCompatDelegate.MODE_NIGHT_YES;
                 break;
             case AppCompatDelegate.MODE_NIGHT_YES:
                 night_mode_btn.setImageResource(R.drawable.white_logo);
-                nextMode = AppCompatDelegate.MODE_NIGHT_AUTO;
+                night_mode = AppCompatDelegate.MODE_NIGHT_AUTO;
                 break;
         }
 
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
                 // change theme Preference
                 SharedPreferences.Editor editor;
                 editor = sharedPref.edit();
-                editor.putInt("night_mode", nextMode);
+                editor.putInt("night_mode", night_mode);
                 editor.apply();
                 recreate();
             }
