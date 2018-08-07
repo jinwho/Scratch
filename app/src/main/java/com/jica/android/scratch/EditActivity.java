@@ -159,7 +159,7 @@ public class EditActivity extends AppCompatActivity {
             note.setModified(now);
             noteViewModel.insert(note);
         }
-
+        //사진 가져왔을 때 url을 저장해놓고 지금 저장하자.
         // if picture exist save to file (with filename)
         // filename.isEmpty();
     }
@@ -173,8 +173,13 @@ public class EditActivity extends AppCompatActivity {
             //사진을 가져와 보여준다, 사진은 전역변수로 기억했다가 필요에 따라 저장한다.
             try {
                 final Uri imageUri = data.getData();
+                //out of memory error
                 final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 8;
+
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream,null,options);
                 picture.setImageBitmap(selectedImage);
                 picture.setVisibility(View.VISIBLE);
             } catch (FileNotFoundException e) {
@@ -185,5 +190,9 @@ public class EditActivity extends AppCompatActivity {
         }else {
             Toast.makeText(this, "You haven't picked Image",Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void setPiecture(String filepath){
+
     }
 }
