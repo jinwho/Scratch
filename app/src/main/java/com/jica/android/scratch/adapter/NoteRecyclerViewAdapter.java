@@ -14,47 +14,15 @@ import com.jica.android.scratch.db.entity.SmallNote;
 
 import java.util.List;
 
-public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerViewAdapter.CaseFileViewHolder> {
+public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerViewAdapter.NoteViewHolder> {
 
     private final LayoutInflater mInflater;
     private List<SmallNote> smallNotes; // Cached copy of words
     private NoteAdapterCallback noteAdapterCallback;
 
-    public NoteRecyclerViewAdapter(Context context) {
-        this.noteAdapterCallback = ((NoteAdapterCallback) context);
-        this.mInflater = LayoutInflater.from(context);
-    }
-
-    public void setSmallNotes(List<SmallNote> smallNotes){
-        this.smallNotes = smallNotes;
-        notifyDataSetChanged();
-    }
-
-    @NonNull
-    @Override
-    public CaseFileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = mInflater.inflate(R.layout.recyclerview_row, parent, false);
-        return new CaseFileViewHolder(itemView);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull CaseFileViewHolder holder, final int position) {
-        if (smallNotes != null) {
-            final SmallNote smallNote = smallNotes.get(position);
-            holder.title.setText(smallNote.getTitle());
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        if (smallNotes != null)
-            return smallNotes.size();
-        else return 0;
-    }
-
-    class CaseFileViewHolder extends RecyclerView.ViewHolder{
+    class NoteViewHolder extends RecyclerView.ViewHolder{
         private final TextView title;
-        private CaseFileViewHolder(@NonNull View itemView) {
+        private NoteViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
 
@@ -77,5 +45,37 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
     public interface NoteAdapterCallback {
         void deleteCallback(int pos);
         void viewCallback(int id);
+    }
+
+    public NoteRecyclerViewAdapter(Context context) {
+        this.noteAdapterCallback = ((NoteAdapterCallback) context);
+        this.mInflater = LayoutInflater.from(context);
+    }
+
+    public void setSmallNotes(List<SmallNote> smallNotes){
+        this.smallNotes = smallNotes;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View itemView = mInflater.inflate(R.layout.recyclerview_row, parent, false);
+        return new NoteViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull NoteViewHolder holder, final int position) {
+        if (smallNotes != null) {
+            final SmallNote smallNote = smallNotes.get(position);
+            holder.title.setText(smallNote.getTitle());
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        if (smallNotes != null)
+            return smallNotes.size();
+        else return 0;
     }
 }
