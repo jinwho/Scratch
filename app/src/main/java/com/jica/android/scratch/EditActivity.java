@@ -2,14 +2,17 @@ package com.jica.android.scratch;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,12 +26,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.Note;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -43,6 +51,7 @@ public class EditActivity extends AppCompatActivity {
     private Note note;
 
     private boolean isUpdateMode;
+    private boolean isPictureSet;
 
     @BindView(R.id.title)
     TextView title;
@@ -87,14 +96,16 @@ public class EditActivity extends AppCompatActivity {
                             title.setText(observer_note.getTitle());
                             contents.setText(observer_note.getContents());
 
-                            //만약 사진이 있다면 보여준다.
+                            //만약 사진이 있다면 보여준다. // better way? TODO
                             String filename = observer_note.getFilename();
                             if (filename != null) {
                                 File file = new File(getFilesDir(), filename);
-                                if (file.exists()) {
-                                    picture.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
-                                    picture.setVisibility(View.VISIBLE);
-                                }
+                                picture.setVisibility(View.VISIBLE);
+                                Glide.with(EditActivity.this)
+                                        .load(file)
+                                        .apply(RequestOptions.skipMemoryCacheOf(true))
+                                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+                                        .into(picture);
                             }
                         }
                     }
@@ -119,7 +130,6 @@ public class EditActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // TODO
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -128,7 +138,7 @@ public class EditActivity extends AppCompatActivity {
                 saveNote();
                 finish();
                 return true;
-            case R.id.menu_gallery :
+            case R.id.menu_gallery:
                 Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 startActivityForResult(intent, SELECT_FROM_GALLERY);
                 return true;
@@ -137,62 +147,65 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
-    public void saveNote(){
+    public void saveNote() {
+        //set note data
         note.setTitle(title.getText().toString());
         note.setContents(contents.getText().toString());
 
-        //getNote current date
+        //get current date
         Date now = new Date();
 
-        //TODO 사진을 가져왔다면
-        String filename;
+        // TODO how to save original photo from gallery, also GIF support
+        // TODO maybe use : class fileAsyncTask extends AsyncTask <File,Void,Void>{}
+        // TODO dealing with Glide caches!!
+        // save file when picture set is true
+        if (isPictureSet) {
+
+            // 파일 이름 설정
+            String filename = note.getFilename();
+            if (filename == null) {
+                filename = now.getTime() + ".png";
+                note.setFilename(filename);
+            }
+
+            // 비트맵
+            picture.invalidate();
+            BitmapDrawable drawable = (BitmapDrawable) picture.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+
+            // 파일 저장
+            try {
+                FileOutputStream outputStream = openFileOutput(filename, MODE_PRIVATE);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // save note
         if (isUpdateMode) {
-            // 업데이트 모드일 경우 기존의 파일이름
-            filename = note.getFilename();
             note.setModified(now);
             noteViewModel.update(note);
         } else {
-            // 업데이트 모드가 아닐 경우 파일 이름 생성
-            filename = now.getTime()+".png";
-            note.setFilename(filename);
             note.setCreated(now);
             note.setModified(now);
             noteViewModel.insert(note);
         }
-        //사진 가져왔을 때 url을 저장해놓고 지금 저장하자.
-        // if picture exist save to file (with filename)
-        // filename.isEmpty();
     }
-
-    //class fileAsynctask extends AsyncTask <File,Void,Void>{}
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SELECT_FROM_GALLERY && resultCode == RESULT_OK) {
-            //사진을 가져와 보여준다, 사진은 전역변수로 기억했다가 필요에 따라 저장한다.
-            try {
-                final Uri imageUri = data.getData();
-                //out of memory error
-                final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inSampleSize = 8;
-
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream,null,options);
-                picture.setImageBitmap(selectedImage);
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                isPictureSet = true;
                 picture.setVisibility(View.VISIBLE);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
+                Glide.with(this)
+                        .load(imageUri)
+                        .into(picture);
             }
-
-        }else {
-            Toast.makeText(this, "You haven't picked Image",Toast.LENGTH_LONG).show();
         }
-    }
-
-    private void setPiecture(String filepath){
-
     }
 }

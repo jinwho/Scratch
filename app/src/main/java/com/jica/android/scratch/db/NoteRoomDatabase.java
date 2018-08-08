@@ -8,7 +8,7 @@ import android.content.Context;
 import com.jica.android.scratch.db.entity.Note;
 
 
-@Database(entities = {Note.class}, version = 1, exportSchema = false)
+@Database(entities = {Note.class}, version = 2, exportSchema = false)
 public abstract class NoteRoomDatabase extends RoomDatabase {
 
     public abstract NoteDao noteDao();

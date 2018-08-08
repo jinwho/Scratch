@@ -17,6 +17,7 @@ import android.widget.ImageView;
 
 import com.jica.android.scratch.adapter.NoteRecyclerViewAdapter;
 import com.jica.android.scratch.db.NoteViewModel;
+import com.jica.android.scratch.db.entity.Note;
 import com.jica.android.scratch.db.entity.SmallNote;
 
 import java.util.List;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         AppCompatDelegate.setDefaultNightMode(night_mode);
 
         switch (night_mode) {
-            //나이트 모드 상태에 따라 로고 이미지를 바꾼다.
+            //나이트 모드 상태에 따라 로고 이미지를 바꾸고, 다음 값을 생각해 놓는다.
             case AppCompatDelegate.MODE_NIGHT_AUTO:
                 night_mode_btn.setImageResource(R.drawable.grey_logo);
                 //다음 값을 저장해놓는다.
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
     @Override
     public void deleteCallback(int id) {
         //TODO 지울 때 사진도 지워야 한다.
+        //deleteFile(fileName);
         noteViewModel.delete(id);
     }
 

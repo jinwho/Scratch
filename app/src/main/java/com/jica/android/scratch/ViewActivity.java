@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,8 +18,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.Note;
 
@@ -45,13 +50,14 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
     TextView modified;
     @BindView(R.id.picture)
     ImageView picture;
+    @BindView(R.id.view_activity)
+    ConstraintLayout view_activity;
 
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //TODO change image size
         setContentView(R.layout.activity_view);
         ButterKnife.bind(this);
         NoteViewModel noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
@@ -80,14 +86,19 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
                             created.setText(createdText);
                             modified.setText(modifiedText);
 
+
+                            //TODO how to use cache?
                             //만약 사진이 있다면 보여준다.
                             String filename = observer_note.getFilename();
                             if (filename != null) {
                                 File file = new File(getFilesDir(), filename);
-                                if (file.exists()) {
-                                    picture.setImageBitmap(BitmapFactory.decodeFile(file.getPath()));
-                                    picture.setVisibility(View.VISIBLE);
-                                }
+                                picture.setVisibility(View.VISIBLE);
+                                Glide.with(ViewActivity.this)
+                                        .load(file)
+                                        .thumbnail((float)0.3)
+                                        .apply(RequestOptions.skipMemoryCacheOf(true))
+                                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+                                        .into(picture);
                             }
                         }
                     }
@@ -109,7 +120,15 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO view picture
+                //TODO start view image on click
+                Toast.makeText(ViewActivity.this, "View Image in Large Size not works yet!", Toast.LENGTH_SHORT).show();
+                /*
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                //intent.setDataAndType(imageUri,"image/*");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(intent, "View using"));
+                */
             }
         });
     }
