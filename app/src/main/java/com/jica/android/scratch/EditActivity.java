@@ -2,18 +2,12 @@ package com.jica.android.scratch;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,20 +21,12 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.Note;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -50,7 +36,6 @@ public class EditActivity extends AppCompatActivity {
 
     // Request Code
     private static final int SELECT_FROM_GALLERY = 1;
-    private static final int GET_FROM_URL = 2;
 
     private NoteViewModel noteViewModel;
     private Note note;
@@ -141,39 +126,30 @@ public class EditActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.menu_gallery:
-                //TODO
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(intent, SELECT_FROM_GALLERY);
+                return true;
+            case R.id.menu_url:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Url 을 입력하세요.");
 
                 // Set up the input
                 final EditText input = new EditText(this);
-                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(input);
 
                 // Set up the buttons
-                builder.setPositiveButton("URL", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Uri uri =  Uri.parse( "https://upload.wikimedia.org/wikipedia/commons/1/16/Parallax-scroll-example.gif" );
+                        Uri uri =  Uri.parse( input.getText().toString() );
                         picture.setVisibility(View.VISIBLE);
-                        Glide.with(EditActivity.this)
-                                .load(uri)
-                                .into(picture);
                         imageUri = uri;
-                    }
-                });
-                builder.setNegativeButton("Gallery", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
-                        startActivityForResult(intent, SELECT_FROM_GALLERY);
+                        setImage();
                     }
                 });
                 builder.create().show();
 
-
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -211,13 +187,19 @@ public class EditActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SELECT_FROM_GALLERY && resultCode == RESULT_OK) {
+
             imageUri = data.getData();
             if (imageUri != null) {
-                picture.setVisibility(View.VISIBLE);
-                Glide.with(this)
-                        .load(imageUri)
-                        .into(picture);
+                setImage();
             }
         }
+    }
+
+    private void setImage(){
+        picture.setVisibility(View.VISIBLE);
+        Glide.with(this)
+                .load(imageUri)
+                .into(picture);
+
     }
 }

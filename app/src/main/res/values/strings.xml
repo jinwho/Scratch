@@ -6,6 +6,8 @@
     <string name="contents">내용</string>
     <string name="created_date">생성일:</string>
     <string name="modified_date">수정일:</string>
-    <string name="picture_gallery">사진</string>
     <string name="image_view_description">ImageView</string>
+    <string name="get_picture">사진 가져오기</string>
+    <string name="from_url">URL에서 가져오기</string>
+    <string name="from_gallery">갤러리에서 가져오기</string>
 </resources>

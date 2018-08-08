@@ -5,8 +5,21 @@
         android:title="@string/save"
         android:icon="@android:drawable/ic_menu_save"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/menu_gallery"
-        android:title="@string/picture_gallery"
+
+    <item android:title="@string/get_picture"
         android:icon="@android:drawable/ic_menu_gallery"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" >
+        <!-- sub menu -->
+        <menu>
+            <item android:id="@+id/menu_gallery"
+                android:title="@string/from_gallery"
+                android:icon="@android:drawable/ic_menu_gallery"/>
+            <item
+                android:id="@+id/menu_url"
+                android:icon="@android:drawable/ic_menu_search"
+                android:title="@string/from_url" />
+        </menu>
+    </item>
+
+
 </menu>
