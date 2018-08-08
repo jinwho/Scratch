@@ -4,6 +4,8 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -22,8 +24,13 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.Note;
 
@@ -52,7 +59,6 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
     ImageView picture;
     @BindView(R.id.view_activity)
     ConstraintLayout view_activity;
-
 
 
     @Override
@@ -86,28 +92,23 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
                             created.setText(createdText);
                             modified.setText(modifiedText);
 
-
-                            //TODO how to use cache?
                             //만약 사진이 있다면 보여준다.
-                            String filename = observer_note.getFilename();
-                            if (filename != null) {
-                                File file = new File(getFilesDir(), filename);
+                            final Uri noteUri = observer_note.getImageUri();
+                            if (noteUri != null) {
                                 picture.setVisibility(View.VISIBLE);
                                 Glide.with(ViewActivity.this)
-                                        .load(file)
-                                        .thumbnail((float)0.3)
-                                        .apply(RequestOptions.skipMemoryCacheOf(true))
-                                        .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+                                        .load(noteUri)
                                         .into(picture);
                             }
                         }
                     }
                 });
-            }else {
+            } else {
                 Log.d("ViewActivity", "id does not exist");
                 finish();
             }
         } else {
+            Log.d("ViewActivity", "id does not exist");
             finish();
         }
 
@@ -121,7 +122,8 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
             @Override
             public void onClick(View view) {
                 //TODO start view image on click
-                Toast.makeText(ViewActivity.this, "View Image in Large Size not works yet!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(ViewActivity.this, "View Image in Large Size not works yet!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ViewActivity.this, note.getImageUri().toString(), Toast.LENGTH_LONG).show();
                 /*
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);

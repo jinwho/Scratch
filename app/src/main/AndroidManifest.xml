@@ -2,8 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.jica.android.scratch">
 
-    <!-- read picture from external and save to internal
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>-->
+    <!-- TODO read picture from external and save to internal :: have to dealing with uri permission -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_USER_DICTIONARY"/>
+    <uses-permission android:name="android.permission.WRITE_USER_DICTIONARY"/>
 
     <application
         android:allowBackup="true"
