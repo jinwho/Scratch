@@ -131,7 +131,7 @@ public class EditActivity extends AppCompatActivity {
                 return true;
             case R.id.menu_url:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Url 을 입력하세요.");
+                builder.setTitle(R.string.from_url);
 
                 // Set up the input
                 final EditText input = new EditText(this);
@@ -139,17 +139,15 @@ public class EditActivity extends AppCompatActivity {
                 builder.setView(input);
 
                 // Set up the buttons
-                builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Uri uri =  Uri.parse( input.getText().toString() );
+                        imageUri = Uri.parse( input.getText().toString() );
                         picture.setVisibility(View.VISIBLE);
-                        imageUri = uri;
                         setImage();
                     }
                 });
                 builder.create().show();
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -163,10 +161,7 @@ public class EditActivity extends AppCompatActivity {
         //get current date
         Date now = new Date();
 
-        // TODO how to save original photo from gallery, also GIF support
-        // TODO maybe use : class fileAsyncTask extends AsyncTask <File,Void,Void>{}
-        // TODO dealing with Glide caches!!
-        // save file when picture set is true
+        // TODO save original photo with AsyncTask
         if (imageUri != null) {
             // 노트 Uri 설정
             note.setImageUri(imageUri);

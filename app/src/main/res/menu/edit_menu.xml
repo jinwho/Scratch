@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_save"
-        android:title="@string/save"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_save"
         android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/save"
         app:showAsAction="ifRoom" />
 
-    <item android:title="@string/get_picture"
+    <item
         android:icon="@android:drawable/ic_menu_gallery"
-        app:showAsAction="ifRoom" >
-        <!-- sub menu -->
+        android:title="@string/picture_from"
+        app:showAsAction="ifRoom">
+        <!-- Sub menu -->
         <menu>
-            <item android:id="@+id/menu_gallery"
-                android:title="@string/from_gallery"
-                android:icon="@android:drawable/ic_menu_gallery"/>
+            <item
+                android:id="@+id/menu_gallery"
+                android:title="@string/from_gallery"/>
+
             <item
                 android:id="@+id/menu_url"
-                android:icon="@android:drawable/ic_menu_search"
-                android:title="@string/from_url" />
+                android:title="@string/from_url"/>
         </menu>
     </item>
 

@@ -47,6 +47,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        tools:listitem="@layout/recyclerview_row" />
+        tools:listitem="@layout/recyclerview_item" />
 
 </android.support.constraint.ConstraintLayout>
