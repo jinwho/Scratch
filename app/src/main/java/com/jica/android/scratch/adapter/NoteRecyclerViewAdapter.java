@@ -60,7 +60,7 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
     @NonNull
     @Override
     public NoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = mInflater.inflate(R.layout.recyclerview_row, parent, false);
+        View itemView = mInflater.inflate(R.layout.recyclerview_grid, parent, false);
         return new NoteViewHolder(itemView);
     }
 

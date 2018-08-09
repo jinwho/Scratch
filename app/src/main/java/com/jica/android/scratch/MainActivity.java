@@ -1,5 +1,6 @@
 package com.jica.android.scratch;
 
+import android.Manifest;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -8,9 +9,11 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.webkit.PermissionRequest;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -19,6 +22,10 @@ import com.jica.android.scratch.adapter.NoteRecyclerViewAdapter;
 import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.Note;
 import com.jica.android.scratch.db.entity.SmallNote;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.util.List;
 
@@ -46,11 +53,19 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Dexter.withActivity(this)
+                .withPermissions(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.INTERNET
+                ).withListener(new MultiplePermissionsListener() {
+            @Override public void onPermissionsChecked(MultiplePermissionsReport report) {/* ... */}
+            @Override public void onPermissionRationaleShouldBeShown(List<com.karumi.dexter.listener.PermissionRequest> permissions, PermissionToken token) {/* ... */}
+        }).check();
 
         setContentView(R.layout.activity_main);
         noteViewModel = ViewModelProviders.of(this).get(NoteViewModel.class);
         ButterKnife.bind(this);
-
 
         // set theme based preference
         sharedPref = getPreferences(MODE_PRIVATE);
@@ -80,7 +95,9 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         final NoteRecyclerViewAdapter noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(this);
         recyclerview.setAdapter(noteRecyclerViewAdapter);
         recyclerview.setHasFixedSize(true);
-        recyclerview.setLayoutManager(new LinearLayoutManager(this));
+        int numberOfColumns = 3;
+        recyclerview.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
+        //recyclerview.setLayoutManager(new LinearLayoutManager(this));
         //no need to have separator line
         //recyclerview.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
@@ -115,9 +132,9 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         });
     }
 
-
     @Override
     public void deleteCallback(int id) {
+        //ask delete
         //TODO 지울 때 사진도 지워야 한다.
         //deleteFile(fileName);
         noteViewModel.delete(id);
