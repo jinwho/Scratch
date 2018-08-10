@@ -6,22 +6,4 @@
         android:icon="@android:drawable/ic_menu_save"
         android:title="@string/save"
         app:showAsAction="ifRoom" />
-
-    <item
-        android:icon="@android:drawable/ic_menu_gallery"
-        android:title="@string/picture_from"
-        app:showAsAction="ifRoom">
-        <!-- Sub menu -->
-        <menu>
-            <item
-                android:id="@+id/menu_gallery"
-                android:title="@string/from_gallery"/>
-
-            <item
-                android:id="@+id/menu_url"
-                android:title="@string/from_url"/>
-        </menu>
-    </item>
-
-
 </menu>

@@ -122,18 +122,7 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
                 .setMessage(R.string.ask_delete)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        //get note from id, and delete if it have file name
-                        noteViewModel.getNote(id).observe(MainActivity.this, new Observer<Note>() {
-                            @Override
-                            public void onChanged(@Nullable Note note) {
-                                if (note != null) {
-                                    if (note.getFilename() != null) {
-                                        deleteFile(note.getFilename());
-                                    }
-                                    noteViewModel.delete(id);
-                                }
-                            }
-                        });
+                        noteViewModel.delete(id);
                     }
                 }).setNegativeButton(android.R.string.no, null).create().show();
     }
