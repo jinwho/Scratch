@@ -3,12 +3,13 @@ package com.jica.android.scratch.db.entity;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
-import android.net.Uri;
+
+import com.jica.android.scratch.db.typeconverter.DateTypeConverter;
 
 import java.util.Date;
 
 @Entity
-@TypeConverters({DateTypeConverter.class, UriTypeConverter.class})
+@TypeConverters({DateTypeConverter.class})
 public class Note {
 
     @PrimaryKey(autoGenerate = true)
@@ -20,14 +21,14 @@ public class Note {
     private Date created;
     private Date modified;
 
-    private Uri imageUri;
+    private String filename;
 
-    public Uri getImageUri() {
-        return imageUri;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setImageUri(Uri imageUri) {
-        this.imageUri = imageUri;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
     public Integer getId() {

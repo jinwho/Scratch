@@ -3,6 +3,7 @@ package com.jica.android.scratch;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -35,6 +36,7 @@ import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.Note;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -93,12 +95,21 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
                             modified.setText(modifiedText);
 
                             //만약 사진이 있다면 보여준다.
-                            final Uri noteUri = observer_note.getImageUri();
-                            if (noteUri != null) {
+                            String filename = observer_note.getFilename();
+                            if (filename != null) {
                                 picture.setVisibility(View.VISIBLE);
                                 Glide.with(ViewActivity.this)
-                                        .load(noteUri)
+                                        .load(new File(getFilesDir(),filename))
                                         .into(picture);
+                                /*
+                                try {
+                                    FileInputStream inputStream = openFileInput(filename);
+                                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                                    picture.setImageBitmap(bitmap);
+                                    inputStream.close();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }*/
                             }
                         }
                     }
@@ -116,23 +127,6 @@ public class ViewActivity extends AppCompatActivity implements View.OnLongClickL
         title.setOnLongClickListener(this);
         contents.setOnLongClickListener(this);
         picture.setOnLongClickListener(this);
-
-        // click picture to view picture
-        picture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO start view image on click
-                //Toast.makeText(ViewActivity.this, "View Image in Large Size not works yet!", Toast.LENGTH_SHORT).show();
-                Toast.makeText(ViewActivity.this, note.getImageUri().toString(), Toast.LENGTH_LONG).show();
-                /*
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_VIEW);
-                //intent.setDataAndType(imageUri,"image/*");
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                startActivity(Intent.createChooser(intent, "View using"));
-                */
-            }
-        });
     }
 
     @Override

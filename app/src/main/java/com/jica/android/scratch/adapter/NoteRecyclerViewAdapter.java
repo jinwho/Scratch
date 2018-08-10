@@ -29,22 +29,22 @@ public class NoteRecyclerViewAdapter extends RecyclerView.Adapter<NoteRecyclerVi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    noteAdapterCallback.viewCallback(smallNotes.get(getAdapterPosition()).getId());
+                    noteAdapterCallback.onClickCallback(smallNotes.get(getAdapterPosition()).getId());
                 }
             });
 
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    noteAdapterCallback.deleteCallback(smallNotes.get(getAdapterPosition()).getId());
+                    noteAdapterCallback.onLongClickCallback(smallNotes.get(getAdapterPosition()).getId());
                     return true;
                 }
             });
         }
     }
     public interface NoteAdapterCallback {
-        void deleteCallback(int pos);
-        void viewCallback(int id);
+        void onLongClickCallback(int pos);
+        void onClickCallback(int id);
     }
 
     public NoteRecyclerViewAdapter(Context context) {

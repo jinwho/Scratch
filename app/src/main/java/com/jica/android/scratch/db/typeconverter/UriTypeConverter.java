@@ -1,4 +1,4 @@
-package com.jica.android.scratch.db.entity;
+package com.jica.android.scratch.db.typeconverter;
 
 import android.arch.persistence.room.TypeConverter;
 import android.net.Uri;

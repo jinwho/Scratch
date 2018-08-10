@@ -2,10 +2,12 @@ package com.jica.android.scratch;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.DividerItemDecoration;
@@ -17,6 +19,7 @@ import android.widget.ImageView;
 
 import com.jica.android.scratch.adapter.NoteRecyclerViewAdapter;
 import com.jica.android.scratch.db.NoteViewModel;
+import com.jica.android.scratch.db.entity.Note;
 import com.jica.android.scratch.db.entity.SmallNote;
 
 import java.util.List;
@@ -77,13 +80,10 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
         final NoteRecyclerViewAdapter noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(this);
         recyclerview.setAdapter(noteRecyclerViewAdapter);
         recyclerview.setHasFixedSize(true);
-        //int numberOfColumns = 2;
-        //recyclerview.setLayoutManager(new GridLayoutManager(this, numberOfColumns));
         recyclerview.setLayoutManager(new LinearLayoutManager(this));
-        //no need to have separator line
         recyclerview.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
 
-
+        //get small note and observe and set to adapter
         noteViewModel.getSmallNotes().observe(this, new Observer<List<SmallNote>>() {
             @Override
             public void onChanged(@Nullable final List<SmallNote> smallNote) {
@@ -115,15 +115,31 @@ public class MainActivity extends AppCompatActivity implements NoteRecyclerViewA
     }
 
     @Override
-    public void deleteCallback(int id) {
+    public void onLongClickCallback(final int id) {
         //ask delete
-        //TODO 지울 때 사진도 지워야 한다.
-        //deleteFile(fileName);
-        noteViewModel.delete(id);
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_menu_delete)
+                .setMessage(R.string.ask_delete)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        //get note from id, and delete if it have file name
+                        noteViewModel.getNote(id).observe(MainActivity.this, new Observer<Note>() {
+                            @Override
+                            public void onChanged(@Nullable Note note) {
+                                if (note != null) {
+                                    if (note.getFilename() != null) {
+                                        deleteFile(note.getFilename());
+                                    }
+                                    noteViewModel.delete(id);
+                                }
+                            }
+                        });
+                    }
+                }).setNegativeButton(android.R.string.no, null).create().show();
     }
 
     @Override
-    public void viewCallback(int id) {
+    public void onClickCallback(int id) {
         Intent intent = new Intent(this, ViewActivity.class);
         intent.putExtra("id", id);
         startActivity(intent);

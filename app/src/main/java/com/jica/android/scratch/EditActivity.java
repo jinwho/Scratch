@@ -2,8 +2,13 @@ package com.jica.android.scratch;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,15 +23,26 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.jica.android.scratch.db.NoteViewModel;
 import com.jica.android.scratch.db.entity.Note;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -41,6 +57,7 @@ public class EditActivity extends AppCompatActivity {
     private Note note;
 
     private boolean isUpdateMode;
+    private boolean isImageChanged;
     private Uri imageUri;
 
     @BindView(R.id.title)
@@ -87,12 +104,12 @@ public class EditActivity extends AppCompatActivity {
                             contents.setText(observer_note.getContents());
 
                             //만약 사진이 있다면 보여준다.
-                            Uri noteUri = observer_note.getImageUri();
-                            if (noteUri != null) {
-                                picture.setVisibility(View.VISIBLE);
-                                Glide.with(EditActivity.this)
-                                        .load(noteUri)
-                                        .into(picture);
+                            String filename = observer_note.getFilename();
+                            if (filename != null) {
+                                imageUri = Uri.fromFile(new File(getFilesDir(), filename));
+                                if (imageUri != null) {
+                                    setImage();
+                                }
                             }
                         }
                     }
@@ -130,24 +147,29 @@ public class EditActivity extends AppCompatActivity {
                 startActivityForResult(intent, SELECT_FROM_GALLERY);
                 return true;
             case R.id.menu_url:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.from_url);
-
                 // Set up the input
                 final EditText input = new EditText(this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
 
-                // Set up the buttons
-                builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        imageUri = Uri.parse( input.getText().toString() );
-                        picture.setVisibility(View.VISIBLE);
-                        setImage();
-                    }
-                });
-                builder.create().show();
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.from_url)
+                        .setView(input)
+                        .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String url = input.getText().toString();
+                                // check if it's valid url
+                                if (!URLUtil.isValidUrl(url)){
+                                    Toast.makeText(EditActivity.this, R.string.warning_wrong_url, Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                imageUri = Uri.parse(url);
+                                if (imageUri != null) {
+                                    isImageChanged = true;
+                                    setImage();
+                                }
+                            }
+                        }).create().show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -161,10 +183,29 @@ public class EditActivity extends AppCompatActivity {
         //get current date
         Date now = new Date();
 
-        // TODO save original photo with AsyncTask
-        if (imageUri != null) {
-            // 노트 Uri 설정
-            note.setImageUri(imageUri);
+
+        // if new image set from uri(from URL or from sd card)
+        if (isImageChanged) {
+
+            // if old file exist then delete
+            if (note.getFilename() != null) {
+                deleteFile(note.getFilename());
+            }
+
+            // generate file data
+            String filename = now.getTime() + ".png";
+            note.setFilename(filename);
+            Bitmap bitmap = ((BitmapDrawable) picture.getDrawable()).getBitmap();
+
+            // TODO better way to save file?
+            try {
+                FileOutputStream outputStream = openFileOutput(filename, MODE_PRIVATE);
+                //FileWriter fileWriter;
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                outputStream.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         // save note
@@ -185,16 +226,16 @@ public class EditActivity extends AppCompatActivity {
 
             imageUri = data.getData();
             if (imageUri != null) {
+                isImageChanged = true;
                 setImage();
             }
         }
     }
 
-    private void setImage(){
-        picture.setVisibility(View.VISIBLE);
-        Glide.with(this)
-                .load(imageUri)
-                .into(picture);
 
+    // from imageUri
+    private void setImage() {
+        picture.setVisibility(View.VISIBLE);
+        Glide.with(this).load(imageUri).into(picture);
     }
 }
