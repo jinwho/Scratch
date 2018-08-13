@@ -6,6 +6,7 @@ Simple, Fast Android Memo App
 
 * daynight theme을 사용 했으며, 가독성을 위해 나이트모드로 전환할 수 있음.
 * Glide 라이브러리로 사진을 불러 온다. Url을 통해서도 사진을 저장해 놓을 수 있다.
+* [실행 파일](https://github.com/jinwho/Scratch/raw/master/app-debug.apk)
 
 ## 실행 화면
 
